@@ -318,7 +318,7 @@ public:
    virtual void   CallFunc_ExecWithArgsAndReturn(CallFunc_t * /* func */, void * /* address */, const void* /* args */ [] = nullptr, int /*nargs*/ = 0, void * /* ret */ = nullptr) const {}
    virtual Longptr_t CallFunc_ExecInt(CallFunc_t * /* func */, void * /* address */) const {return 0;}
    virtual Long64_t  CallFunc_ExecInt64(CallFunc_t * /* func */, void * /* address */) const {return 0;}
-   virtual Double_t  CallFunc_ExecDouble(CallFunc_t * /* func */, void * /* address */) const {return 0;}
+   virtual Double_t  CallFunc_ExecDouble(CallFunc_t * /* func */, void * /* address */) const {return -3;}
    virtual CallFunc_t   *CallFunc_Factory() const {return nullptr;}
    virtual CallFunc_t   *CallFunc_FactoryCopy(CallFunc_t * /* func */) const {return nullptr;}
    virtual MethodInfo_t *CallFunc_FactoryMethod(CallFunc_t * /* func */) const {return nullptr;}

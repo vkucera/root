@@ -2430,7 +2430,7 @@ Long64_t TTreePlayer::Scan(const char *varexp, const char *selection,
                            Option_t * option,
                            Long64_t nentries, Long64_t firstentry)
 {
-
+   printf("varexp = %s\n", varexp);
    TString opt = option;
    opt.ToLower();
    UInt_t ui;
@@ -2571,6 +2571,7 @@ Long64_t TTreePlayer::Scan(const char *varexp, const char *selection,
 //*-*- if varexp is empty, take first 8 columns by default
    int allvar = 0;
    if (varexp && !strcmp(varexp, "*")) { ncols = nleaves; allvar = 1; }
+   printf("nch = %d, ncols = %d, allvar = %d\n", nch, ncols, allvar);
    if (nch == 0 || allvar) {
       UInt_t ncs = ncols;
       ncols = 0;
@@ -2607,7 +2608,9 @@ Long64_t TTreePlayer::Scan(const char *varexp, const char *selection,
 //*-*- otherwise select only the specified columns
    } else {
 
-      ncols = fSelector->SplitNames(varexp, cnames);
+      ncols = fSelector->SplitNames(varexp, cnames); // parse varexp
+      printf("nch = %d, ncols = %d, allvar = %d\n", nch, ncols, allvar);
+      for (auto s : cnames) { printf("%s\n", s.Data()); }
 
    }
    var = new TTreeFormula* [ncols];
@@ -2639,6 +2642,7 @@ Long64_t TTreePlayer::Scan(const char *varexp, const char *selection,
       }
       for(i=0;i<=fFormulaList->LastIndex();i++) {
          TTreeFormula *form = ((TTreeFormula*)fFormulaList->At(i));
+         printf("formula %d: %s, %s\n", i, form->GetName(), form->GetTitle());
          switch( form->GetManager()->GetMultiplicity() ) {
             case  1:
             case  2:
@@ -2751,6 +2755,9 @@ Long64_t TTreePlayer::Scan(const char *varexp, const char *selection,
          }
          for (ui=0;ui<ncols;++ui) {
             TString numbFormat = Form("* %%%d.%ds ",colSizes[ui],colSizes[ui]);
+            printf("value %d: mode 0: %s\n", ui, var[ui]->PrintValue(0)); // wrong value here
+            // printf("value %d: mode -1: %s\n", ui, var[ui]->PrintValue(-1)); // wrong value here
+            // printf("value %d: mode -2: %s\n", ui, var[ui]->PrintValue(-2)); // wrong value here
             if (var[ui]->GetNdim()) onerow += Form(numbFormat.Data(),var[ui]->PrintValue(0,inst,colFormats[ui].Data()));
             else {
                TString emptyForm = Form("* %%%dc ",colSizes[ui]);

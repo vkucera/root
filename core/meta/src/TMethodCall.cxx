@@ -621,6 +621,7 @@ void TMethodCall::SetParam(Float_t f)
 void TMethodCall::SetParam(Double_t d)
 {
    if (!fFunc) return;
+   printf("TMethodCall::SetParam: Setting %g\n", d);
    gCling->CallFunc_SetArg(fFunc,d);
 }
 

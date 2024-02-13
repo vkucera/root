@@ -3943,6 +3943,7 @@ T TTreeFormula::EvalInstance(Int_t instance, const char *stringStackArg[])
 {
 // Note that the redundancy and structure in this code is tailored to improve
 // efficiencies.
+   printf("EvalInstance first\n");
    if (TestBit(kMissingLeaf)) return 0;
    if (fNoper == 1 && fNcodes > 0) {
 
@@ -4006,6 +4007,8 @@ T TTreeFormula::EvalInstance(Int_t instance, const char *stringStackArg[])
       }
    }
 
+   printf("EvalInstance middle\n");
+
    T tab[kMAXFOUND];
    const Int_t kMAXSTRINGFOUND = 10;
    const char *stringStackLocal[kMAXSTRINGFOUND];
@@ -4016,10 +4019,13 @@ T TTreeFormula::EvalInstance(Int_t instance, const char *stringStackArg[])
 
    Int_t pos  = 0;
    Int_t pos2 = 0;
+   printf("fNoper = %d\n", fNoper);
    for (Int_t i=0; i<fNoper ; ++i) {
 
       const Int_t oper = GetOper()[i];
       const Int_t newaction = oper >> kTFOperShift;
+
+      printf("oper = %d, newaction = %d\n", oper, newaction);
 
       if (newaction<kDefinedVariable) {
          // ROOT::v5::TFormula operands.
@@ -4187,7 +4193,7 @@ T TTreeFormula::EvalInstance(Int_t instance, const char *stringStackArg[])
                continue;
             }
 
-            case kFunctionCall: {
+            case kFunctionCall: { // wrong value here
                // an external function call
 
                int param = (oper & kTFOperMask);
@@ -4202,12 +4208,14 @@ T TTreeFormula::EvalInstance(Int_t instance, const char *stringStackArg[])
                if (nargs) {
                   UInt_t argloc = pos-nargs;
                   for(Int_t j=0;j<nargs;j++,argloc++,pos--) {
+                     printf("Setting param %d: %g\n", j, tab[argloc]);
                      SetMethodParam(method, tab[argloc]);
                   }
                }
                pos++;
                Double_t ret = 0;
                method->Execute(ret);
+               printf("ret value = %g\n", ret);
                tab[pos-1] = ret; // check for the correct conversion!
 
                continue;
@@ -4402,8 +4410,10 @@ T TTreeFormula::EvalInstance(Int_t instance, const char *stringStackArg[])
 
       R__ASSERT(i<fNoper);
    }
+   printf("EvalInstance last\n");
 
-   //std::cout << __PRETTY_FUNCTION__ << "  returning " << tab[0] << std::endl;
+   printf("%s returning %g\n", __PRETTY_FUNCTION__, tab[0]);
+   // std::cout << __PRETTY_FUNCTION__ << "  returning " << tab[0] << std::endl;
    return tab[0];
 }
 
@@ -4808,14 +4818,18 @@ char *TTreeFormula::PrintValue(Int_t mode, Int_t instance, const char *decform) 
    static char value[kMAXLENGTH];
 
    if (mode == -2) {
+      // printf("Mode -2\n");
       for (int i = 0; i < kMAXLENGTH-1; i++)
          value[i] = '*';
       value[kMAXLENGTH-1] = 0;
    } else if (mode == -1) {
+      // printf("Mode -1\n");
       snprintf(value, kMAXLENGTH-1, "%s", GetTitle());
    } else if (mode == 0) {
+      // printf("Mode 0\n");
       if ( (fNstring && fNval==0 && fNoper==1) || IsString() )
       {
+         printf("Block 1\n");
          const char * val = nullptr;
          if (GetAction(0)==kStringConst) {
             val = fExpr[0].Data();
@@ -4845,10 +4859,12 @@ char *TTreeFormula::PrintValue(Int_t mode, Int_t instance, const char *decform) 
          }
          value[kMAXLENGTH-1] = 0;
       } else {
+         printf("\nBlock 2\n");
          //NOTE: This is terrible form ... but is forced upon us by the fact that we can not
          //use the mutable keyword AND we should keep PrintValue const.
          Int_t real_instance = ((TTreeFormula*)this)->GetRealInstance(instance,-1);
          if (real_instance<fNdata[0]) {
+            printf("Block 2-1\n");
             Ssiz_t len = strlen(decform);
             Char_t outputSizeLevel = 1;
             char *expo = nullptr;
@@ -4865,6 +4881,7 @@ char *TTreeFormula::PrintValue(Int_t mode, Int_t instance, const char *decform) 
                   case 'h': outputSizeLevel = 0; break;
                }
             }
+            printf("decform: %s, outputSizeLevel: %d\n", decform, outputSizeLevel);
             switch(decform[len-1]) {
                case 'c':
                case 'd':
@@ -4908,6 +4925,7 @@ char *TTreeFormula::PrintValue(Int_t mode, Int_t instance, const char *decform) 
                   break;
                }
                default:
+                  printf("default\n");
                   snprintf(value,kMAXLENGTH,Form("%%%sg",decform),((TTreeFormula*)this)->EvalInstance(instance));
                   expo = strchr(value,'e');
             }
@@ -4926,6 +4944,7 @@ char *TTreeFormula::PrintValue(Int_t mode, Int_t instance, const char *decform) 
                }
             }
          } else {
+            printf("Block 2-2\n");
             if (isalpha(decform[strlen(decform)-1])) {
                TString short_decform(decform);
                short_decform.Remove(short_decform.Length()-1);
