@@ -7846,6 +7846,11 @@ Long64_t TCling::CallFunc_ExecInt64(CallFunc_t* func, void* address) const
 Double_t TCling::CallFunc_ExecDouble(CallFunc_t* func, void* address) const
 {
    TClingCallFunc* f = (TClingCallFunc*) func;
+   if (!f) { printf("TCling::CallFunc_ExecDouble: Error, no function\n"); }
+
+   // return -3.;
+   printf("TCling::CallFunc_ExecDouble:Address: %d\n", address);
+   std::cout << "TCling::CallFunc_ExecDouble: Address: " << address << std::endl;
    return f->ExecDouble(address);
 }
 

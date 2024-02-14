@@ -28,6 +28,7 @@
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
 
+#include <iostream>
 #include "TClingUtils.h"
 #include "TClingMethodInfo.h"
 #include "TInterpreter.h"
@@ -203,6 +204,7 @@ public:
    void ResetArg();
    template<typename T, std::enable_if_t<std::is_fundamental<T>::value, bool> = true>
    void SetArg(T arg) {
+      std::cout << "TClingCallFunc::SetArg: Setting value: " << arg << std::endl;
       fArgVals.push_back(cling::Value::Create(*fInterp, arg));
    }
    void SetArgArray(Longptr_t* argArr, int narg);

@@ -4213,7 +4213,7 @@ T TTreeFormula::EvalInstance(Int_t instance, const char *stringStackArg[])
                   }
                }
                pos++;
-               Double_t ret = 0;
+               Double_t ret = -13.;
                method->Execute(ret);
                printf("ret value = %g\n", ret);
                tab[pos-1] = ret; // check for the correct conversion!

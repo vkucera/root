@@ -478,12 +478,18 @@ void TMethodCall::Execute(void *object, const char *params, Longptr_t &retLong)
 ////////////////////////////////////////////////////////////////////////////////
 /// Execute the method (with preset arguments) for the specified object.
 
-void TMethodCall::Execute(void *object, Double_t &retDouble)
+void TMethodCall::Execute(void *object, Double_t &retDouble) // this one called
 {
+   printf("TMethodCall::Execute\n");
    if (!fFunc) return;
 
    void *address = nullptr;
-   if (object) address = (void*)((Longptr_t)object + fOffset);
+   if (object) {
+      printf("TMethodCall::Execute: Getting address\n");
+      address = (void*)((Longptr_t)object + fOffset);
+   } else {
+      printf("TMethodCall::Execute: No object\n");
+   }
    gCling->SetTempLevel(1);
    retDouble = gCling->CallFunc_ExecDouble(fFunc,address);
    gCling->SetTempLevel(-1);

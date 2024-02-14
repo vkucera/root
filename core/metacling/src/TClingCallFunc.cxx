@@ -1415,6 +1415,7 @@ void TClingCallFunc::exec(void *address, void *ret)
       }
       if (auto CXXMD = dyn_cast<CXXMethodDecl>(FD))
          if (!address && CXXMD && !CXXMD->isStatic() && !isa<CXXConstructorDecl>(FD)) {
+         // if (!address) {
             ::Error("TClingCallFunc::exec",
                     "The method %s is called without an object.",
                     fMethod->Name());
@@ -1450,7 +1451,8 @@ void TClingCallFunc::exec(void *address, void *ret)
             vp_ary.push_back(fArgVals[i].getPtrAddress());
       }
    } // End of scope holding the lock
-   (*fWrapper)(address, (int)num_args, (void **)vp_ary.data(), ret);
+   printf("TClingCallFunc::exec: Calling wrapper with %d arguments\n", num_args); // num_args is correct
+   (*fWrapper)(address, (int)num_args, (void **)vp_ary.data(), ret); // what does this do if address = 0?
 }
 
 void TClingCallFunc::exec_with_valref_return(void *address, cling::Value &ret)
@@ -1470,8 +1472,12 @@ void TClingCallFunc::exec_with_valref_return(void *address, cling::Value &ret)
      ret = cling::Value(QT, *fInterp);
 
      if (QT->isRecordType() || QT->isMemberDataPointerType())
-       return exec(address, ret.getPtr());
+       {
+         printf("TClingCallFunc::exec_with_valref_return: exec call 1\n");
+         return exec(address, ret.getPtr());
+      }
    }
+   printf("TClingCallFunc::exec_with_valref_return: exec call 2\n");
    exec(address, ret.getPtrAddress());
 }
 
@@ -1527,6 +1533,7 @@ T TClingCallFunc::ExecT(void *address)
    cling::Value ret;
    exec_with_valref_return(address, ret);
    if (ret.isVoid()) {
+      printf("TClingCallFunc::ExecT: Returning 0\n");
       return 0;
    }
 
@@ -1839,4 +1846,3 @@ void TClingCallFunc::SetFuncProto(const TClingClassInfo *info, const char *metho
       return;
    }
 }
-
